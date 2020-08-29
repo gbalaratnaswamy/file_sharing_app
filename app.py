@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 from pymongo import MongoClient
 
 app = Flask(__name__)
-
+cluster=MongoClient(port=27017)
 
 @app.route('/', methods=['POST', 'GET'])
 def hello_world():
