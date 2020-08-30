@@ -33,8 +33,14 @@ def logout_user(collection, email: str):
     pass
 
 
-def update_password():
-    pass
+def update_password(email, old_pass, new_pass, collection):
+    user = collection.find_one({"email": email})
+    if user is None:
+        return "error"
+    if user["password"] == encryption.encrypt_string(old_pass):
+        collection.update_one({"email":email},{"$set":{"password":encryption.encrypt_string(new_pass)}})
+        return "success"
+    return "wrong_pass"
 
 
 # check if user is already login

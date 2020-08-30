@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, abort
+from flask import Flask, render_template, request, redirect, abort, url_for
 from flask_pymongo import PyMongo
 from cfg import *
 from user_management import *
@@ -42,7 +42,6 @@ def login(error=None):
 def signup(error=None):
     if request.method == "POST":
         result = create_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
-        print(result)
         # if email already signup
         if result == "user_exist":
             return render_template("errors/error_page.html", email=request.form["email"])
@@ -60,20 +59,25 @@ def signup(error=None):
 
 @app.route("/logout")
 def logout():
-    if check_user(request,mongo.db[AUTH_COLLECTION]):
+    if check_user(request, mongo.db[AUTH_COLLECTION]):
         return cookies.clear_auth_cookies(mongo.db[AUTH_COLLECTION], request)
     return redirect("/login")
 
-# @app.route("/update_pass", methods=["POST", "GET"])
-# def update_pass():
-#     if request.method == "POST":
-#         result = update_password()
-#         if result == "wrong_password":
-#             return render_template()
-#         elif result == "success":
-#             return render_template("")
-#     else:
-#         return render_template("update_pass.html")
+
+@app.route("/update_pass", methods=["POST", "GET"])
+def update_pass():
+    if request.method == "POST":
+        result = update_password(request.cookies.get("email"),request.form["old_pass"],request.form["new_pass"],mongo.db[USER_COLLECTION])
+        if result == "wrong_pass":
+            return render_template("update_pass.html",error="wrong password")
+        elif result == "success":
+            return redirect("/dashboard")
+        elif result == "error":
+            return abort(500)
+    else:
+        if not check_user(request, mongo.db[AUTH_COLLECTION]):
+            return redirect("/login")
+        return render_template("update_pass.html",error=None)
 
 
 @app.route("/dashboard")
@@ -88,7 +92,7 @@ def user_page():
 
 @app.route("/test")
 def testing_page():
-    return abort(500)
+    return redirect(url_for("login"))
 
 
 if __name__ == '__main__':
