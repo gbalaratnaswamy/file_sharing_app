@@ -71,7 +71,9 @@ def signup(error=None):
 
 @app.route("/dashboard")
 def user_page():
+    # check if user login
     result = check_user(request, mongo.db[AUTH_COLLECTION])
+    # if not login redirect to login
     if not result:
         return render_template("login.html",error=errors_and_info.NOT_LOGIN_ERROR)
     return render_template("user_page.html")

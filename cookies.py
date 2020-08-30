@@ -2,6 +2,7 @@ import encryption
 from flask import make_response, redirect
 
 
+# create cookie token and add to database
 def create_auth_cookie(collection, request, redirect_url):
     response = make_response(redirect(redirect_url))
     random_string = encryption.create_cookie_auth(collection)
