@@ -7,7 +7,7 @@ def create_auth_cookie(collection, request, redirect_url):
     random_string = encryption.create_cookie_auth(collection)
     response.set_cookie("email", request.form["email"])
     response.set_cookie("token", random_string)
-    collection.insert_one({"email": request.form["email"], "token": random_string})
+    collection.insert_one({"email": request.form["email"], "token": encryption.encrypt_string(random_string)})
     return response
 
 

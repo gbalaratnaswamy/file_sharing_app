@@ -16,7 +16,7 @@ def hello_world():
 
 @app.route("/login", methods=["POST", "GET"])
 def login(error=None):
-    # if user submits
+    # if user post data
     if request.method == "POST":
         result = login_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
         # if user login successfully
@@ -28,8 +28,8 @@ def login(error=None):
         # if user types wrong password
         elif result == "wrong_pass":
             return render_template("login.html", error=errors_and_info.WRONG_PASS_ERROR)
-    # if user requests page
 
+    # if user requests page (get)
     # if user already login
     if check_user(request, mongo.db[AUTH_COLLECTION]):
         return redirect("/dashboard")
