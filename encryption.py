@@ -17,6 +17,6 @@ def generate_string(length):
 
 def create_cookie_auth(collection, length=COOKIE_LENGTH):
     random_string = generate_string(length)
-    if collection.find_one({"token": random_string}) is None:
+    if collection.find_one({"token": encrypt_string(random_string)}) is None:
         return random_string
     return create_cookie_auth(collection, length)

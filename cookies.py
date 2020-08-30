@@ -12,5 +12,10 @@ def create_auth_cookie(collection, request, redirect_url):
     return response
 
 
-def clear_auth_cookies():
-    pass
+def clear_auth_cookies(collection, request):
+    response=make_response(redirect("/login"))
+    response.delete_cookie("email")
+    token = request.cookies.get("token")
+    response.delete_cookie("token")
+    collection.delete_one({"token": encryption.encrypt_string(token)})
+    return response

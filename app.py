@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, abort, make_response, url_for
+from flask import Flask, render_template, request, redirect, abort
 from flask_pymongo import PyMongo
 from cfg import *
 from user_management import *
 import cookies
 import errors_and_info
+
 app = Flask(__name__)
 app.config["MONGO_URI"] = DATABASE_URL
 mongo = PyMongo(app)
@@ -54,8 +55,14 @@ def signup(error=None):
     # if user already login
     if check_user(request, mongo.db[AUTH_COLLECTION]):
         return redirect("/dashboard")
-    return render_template("signup.html")
+    return render_template("signup.html", error=error)
 
+
+@app.route("/logout")
+def logout():
+    if check_user(request,mongo.db[AUTH_COLLECTION]):
+        return cookies.clear_auth_cookies(mongo.db[AUTH_COLLECTION], request)
+    return redirect("/login")
 
 # @app.route("/update_pass", methods=["POST", "GET"])
 # def update_pass():
@@ -75,7 +82,7 @@ def user_page():
     result = check_user(request, mongo.db[AUTH_COLLECTION])
     # if not login redirect to login
     if not result:
-        return render_template("login.html",error=errors_and_info.NOT_LOGIN_ERROR)
+        return render_template("login.html", error=errors_and_info.NOT_LOGIN_ERROR)
     return render_template("user_page.html")
 
 
