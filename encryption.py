@@ -1,7 +1,7 @@
 import hashlib
 import random
 import string
-from cfg import COOKIE_LENGTH
+from cfg import AUTH_COOKIE_LENGTH
 
 
 def encrypt_string(hash_string):
@@ -15,8 +15,9 @@ def generate_string(length):
     return random_string
 
 
-def create_cookie_auth(collection, length=COOKIE_LENGTH):
+def create_cookie_auth(collection, length=AUTH_COOKIE_LENGTH):
     random_string = generate_string(length)
     if collection.find_one({"token": encrypt_string(random_string)}) is None:
         return random_string
     return create_cookie_auth(collection, length)
+

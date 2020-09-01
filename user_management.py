@@ -1,5 +1,7 @@
 # user info : email, password`
 import encryption
+import pymongo.errors as mongoerror
+from datetime import datetime
 
 
 # create new user in database
@@ -10,10 +12,14 @@ def create_user(collection, password: str, email: str):
     else:
         try:
             collection.insert_one({"email": email,
-                                   "password": encryption.encrypt_string(password)})
+                                   "password": encryption.encrypt_string(password),
+                                   "name": None,
+                                   "created_at": datetime.now(),
+                                   "last_login_date": datetime.now(),
+                                   "updated_at": datetime.now()})
             return "success"
         # if failed to insert
-        except:
+        except (mongoerror.ConnectionFailure, mongoerror.NetworkTimeout):
             return "error"
 
 
@@ -26,11 +32,12 @@ def login_user(collection, password: str, email: str):
     # if password is wrong
     if user["password"] != encryption.encrypt_string(password):
         return "wrong_pass"
+    collection.update_one({"email": email}, {"$set": {"last_login_date": datetime.now()}})
     return "success"
 
 
-def logout_user(collection, email: str):
-    pass
+# def logout_user(collection,request):
+#     pass
 
 
 def update_password(email, old_pass, new_pass, collection):
@@ -38,7 +45,7 @@ def update_password(email, old_pass, new_pass, collection):
     if user is None:
         return "error"
     if user["password"] == encryption.encrypt_string(old_pass):
-        collection.update_one({"email":email},{"$set":{"password":encryption.encrypt_string(new_pass)}})
+        collection.update_one({"email": email}, {"$set": {"password": encryption.encrypt_string(new_pass)}})
         return "success"
     return "wrong_pass"
 
@@ -56,3 +63,7 @@ def check_user(request, collection) -> bool:
     if token is None:
         return False
     return True
+
+
+def change_name(collection,email,new_name):
+    collection.update_one({"email":email},{"$set":{"name":new_name}})

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, abort, url_for
 from flask_pymongo import PyMongo
 from cfg import *
-from user_management import *
+import user_management as usrm
 import cookies
 import errors_and_info
 
@@ -19,7 +19,7 @@ def hello_world():
 def login(error=None):
     # if user post data
     if request.method == "POST":
-        result = login_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
+        result = usrm.login_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
         # if user login successfully
         if result == "success":
             return cookies.create_auth_cookie(mongo.db[AUTH_COLLECTION], request, "/dashboard")
@@ -32,7 +32,7 @@ def login(error=None):
 
     # if user requests page (get)
     # if user already login
-    if check_user(request, mongo.db[AUTH_COLLECTION]):
+    if usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
         return redirect("/dashboard")
     # if user not already login
     return render_template("login.html", error=error)
@@ -41,7 +41,7 @@ def login(error=None):
 @app.route("/signup", methods=["POST", "GET"])
 def signup(error=None):
     if request.method == "POST":
-        result = create_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
+        result = usrm.create_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
         # if email already signup
         if result == "user_exist":
             return render_template("errors/error_page.html", email=request.form["email"])
@@ -52,14 +52,14 @@ def signup(error=None):
 
     # if user requests login page
     # if user already login
-    if check_user(request, mongo.db[AUTH_COLLECTION]):
+    if usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
         return redirect("/dashboard")
     return render_template("signup.html", error=error)
 
 
 @app.route("/logout")
 def logout():
-    if check_user(request, mongo.db[AUTH_COLLECTION]):
+    if usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
         return cookies.clear_auth_cookies(mongo.db[AUTH_COLLECTION], request)
     return redirect("/login")
 
@@ -67,23 +67,24 @@ def logout():
 @app.route("/update_pass", methods=["POST", "GET"])
 def update_pass():
     if request.method == "POST":
-        result = update_password(request.cookies.get("email"),request.form["old_pass"],request.form["new_pass"],mongo.db[USER_COLLECTION])
+        result = usrm.update_password(request.cookies.get("email"), request.form["old_pass"], request.form["new_pass"],
+                                      mongo.db[USER_COLLECTION])
         if result == "wrong_pass":
-            return render_template("update_pass.html",error="wrong password")
+            return render_template("update_pass.html", error="wrong password")
         elif result == "success":
             return redirect("/dashboard")
         elif result == "error":
             return abort(500)
     else:
-        if not check_user(request, mongo.db[AUTH_COLLECTION]):
+        if not usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
             return redirect("/login")
-        return render_template("update_pass.html",error=None)
+        return render_template("update_pass.html", error=None)
 
 
 @app.route("/dashboard")
 def user_page():
     # check if user login
-    result = check_user(request, mongo.db[AUTH_COLLECTION])
+    result = usrm.check_user(request, mongo.db[AUTH_COLLECTION])
     # if not login redirect to login
     if not result:
         return render_template("login.html", error=errors_and_info.NOT_LOGIN_ERROR)
@@ -93,6 +94,20 @@ def user_page():
 @app.route("/test")
 def testing_page():
     return redirect(url_for("login"))
+
+
+@app.route("/userinfo")
+def user_info():
+    if not usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
+        return redirect("/loign")
+    user = mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
+    return render_template("user_info.html", name=user["name"])
+
+
+@app.route("/updatename", methods=["POST"])
+def update_name():
+    usrm.change_name(mongo.db[USER_COLLECTION], request.cookies.get("email"), request.form["newname"])
+    return redirect("/userinfo")
 
 
 if __name__ == '__main__':
