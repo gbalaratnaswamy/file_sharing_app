@@ -62,19 +62,21 @@
 </header>
 <div class="m-5"></div>
 <main>
-    <div class="form container-fluid">
-        <div class="row">
-            <div class="col-sm-3">
-            </div>
-            <div class="col-sm-6" {% block style %}{% endblock %}>
+{#    <div class="form container-fluid">#}
+{#        <div class="row">#}
+{#            <div class="col-sm-3">#}
+{#            </div>#}
+{#            <div class="col-sm-6" {% block style %}{% endblock %}>#}
+<div class="p-1">
                 {% block content %}
                 {% endblock %}
-            </div>
-            <div class="col-sm-3">
-
-            </div>
-        </div>
-    </div>
+</div>
+{#            </div>#}
+{#            <div class="col-sm-3">#}
+{##}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 </main>
 </body>
 </html>

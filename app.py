@@ -1,13 +1,17 @@
 from flask import Flask, render_template, request, redirect, abort, url_for
+from werkzeug.utils import secure_filename
 from flask_pymongo import PyMongo
 from cfg import *
 import user_management as usrm
 import cookies
 import errors_and_info
+from files_blueprint import files_blueprint
+import os
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = DATABASE_URL
 mongo = PyMongo(app)
+app.register_blueprint(files_blueprint)
 
 
 @app.route('/')
@@ -64,7 +68,7 @@ def logout():
     return redirect("/login")
 
 
-@app.route("/update_pass", methods=["POST", "GET"])
+@app.route("/updatepass", methods=["POST", "GET"])
 def update_pass():
     if request.method == "POST":
         result = usrm.update_password(request.cookies.get("email"), request.form["old_pass"], request.form["new_pass"],
@@ -108,6 +112,19 @@ def user_info():
 def update_name():
     usrm.change_name(mongo.db[USER_COLLECTION], request.cookies.get("email"), request.form["newname"])
     return redirect("/userinfo")
+
+
+@app.route('/filesupload', methods=['GET', 'POST'])
+def upload_file():
+    if not usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
+        return redirect("/login")
+    if request.method == 'POST':
+        f = request.files['file']
+        file_name = secure_filename(f.filename)
+
+        f.save(os.path.join("files/", file_name))
+        return 'file uploaded successfully'
+    return render_template("files_upload.html")
 
 
 if __name__ == '__main__':

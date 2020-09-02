@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container-sm p-4" style=" background-color: rgb(248, 248, 248); max-width: 30rem">
+    <h2 class="text-center">login</h2>
+    <form action="/filesupload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileToUpload">
+  <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    </form>
+</div>
+{% endblock %}

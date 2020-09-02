@@ -1,29 +1,29 @@
 {% extends "template.html" %}
-{% block style %}
-    style="background-color: rgb(248, 248, 248);"
-{% endblock %}
+
 {% block content %}
-    <h2 class="text-center">login</h2>
-    <form action="/login" method="post">
-        <div class="form-group">
-            <label for="email">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <div class="container" style="padding: 10px;">
-            <p class="text-sm-right" style="margin: 0;">not a memeber <a href="/signup">signup</a>
-            </p>
-        </div>
-        {% if error is not none %}
-            <div class="alert alert-danger" role="alert">
-                {{ error|safe}}
+    <div class="container-sm p-4" style=" background-color: rgb(248, 248, 248); max-width: 30rem">
+        <h2 class="text-center">login</h2>
+        <form action="/login" method="post">
+            <div class="form-group pb-3">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
-        {% endif %}
+            <div class="form-group pb-3">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            <div class="container" style="padding: 10px">
+                <p class="text-sm-right" style="margin: 0;">not a memeber <a href="/signup">signup</a>
+                </p>
+            </div>
+            {% if error is not none %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error|safe }}
+                </div>
+            {% endif %}
 
 
-    </form>
+        </form>
+    </div>
 {% endblock %}
