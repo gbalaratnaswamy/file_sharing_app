@@ -16,7 +16,8 @@ def create_user(collection, password: str, email: str):
                                    "name": None,
                                    "created_at": datetime.now(),
                                    "last_login_date": datetime.now(),
-                                   "updated_at": datetime.now()})
+                                   "updated_at": datetime.now(),
+                                   "size_consumed": 0})
             return "success"
         # if failed to insert
         except (mongoerror.ConnectionFailure, mongoerror.NetworkTimeout):
@@ -65,5 +66,5 @@ def check_user(request, collection) -> bool:
     return True
 
 
-def change_name(collection,email,new_name):
-    collection.update_one({"email":email},{"$set":{"name":new_name}})
+def change_name(collection, email, new_name):
+    collection.update_one({"email": email}, {"$set": {"name": new_name}})

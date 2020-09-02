@@ -7,11 +7,16 @@ import cookies
 import errors_and_info
 from files_blueprint import files_blueprint
 import os
+from datetime import datetime
+import files_manager as fm
+import encryption
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = DATABASE_URL
 mongo = PyMongo(app)
 app.register_blueprint(files_blueprint)
+app.config["MAX_CONTENT_PATH"] = MAX_FILE_SIZE
+app.config['UPLOAD_FOLDER'] = "files"
 
 
 @app.route('/')
@@ -92,7 +97,8 @@ def user_page():
     # if not login redirect to login
     if not result:
         return render_template("login.html", error=errors_and_info.NOT_LOGIN_ERROR)
-    return render_template("user_page.html")
+    data = mongo.db[FILES_COLLECTION].find({"email": request.cookies.get("email")})
+    return render_template("user_page.html", data=data)
 
 
 @app.route("/test")
@@ -120,10 +126,36 @@ def upload_file():
         return redirect("/login")
     if request.method == 'POST':
         f = request.files['file']
+        user = mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
         file_name = secure_filename(f.filename)
-
-        f.save(os.path.join("files/", file_name))
-        return 'file uploaded successfully'
+        file_type = fm.get_file_type(file_name)
+        file_name = file_name.rsplit('.', 1)[0]
+        if file_type not in ALLOWED_EXTENSIONS:
+            return render_template("files_upload.html", error="files not supported")
+        file_path = os.path.join(f"files/{user['email']}/", file_name)
+        if not os.path.exists(f"files/{user['email']}"):
+            os.mkdir(f"files/{user['email']}")
+        f.save(file_path)
+        file_size = os.stat(file_path).st_size
+        size_consumed = user.get("size_consumed", 0)
+        if size_consumed + file_size > MAX_FILE_SIZE:
+            os.remove(file_path)
+            return render_template("files_upload.html",
+                                   error=f"files size exceed you have already consumed {fm.modify_file_size(size_consumed)} new "
+                                         f"file size is {fm.modify_file_size(file_size)}")
+        mongo.db[FILES_COLLECTION].insert_one({"email": user["email"],
+                                               "file_name": file_name,
+                                               "file_type": file_type,
+                                               "created_at": datetime.now(),
+                                               "file_size": file_size,
+                                               "file_hash": encryption.generate_file_hash(),
+                                               "is_active": True,
+                                               "file_path": "files/" + file_name})
+        size_consumed += file_size
+        mongo.db[USER_COLLECTION].update_one({"_id": user["_id"]},
+                                             {"$set": {"size_consumed": size_consumed,
+                                                       "updated_at": datetime.now()}})
+        return redirect("/dashboard")
     return render_template("files_upload.html")
 
 

@@ -1,11 +1,30 @@
 {% extends "template.html" %}
 
 {% block content %}
-<div class="container-sm p-4" style=" background-color: rgb(248, 248, 248); max-width: 30rem">
-    <h2 class="text-center">login</h2>
-    <form action="/filesupload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" id="fileToUpload">
-  <button type="submit" class="btn btn-primary btn-block">Submit</button>
-    </form>
-</div>
+    <div class="container-sm p-4" style=" background-color: rgb(248, 248, 248); max-width: 30rem">
+        <h2 class="text-center">upload file</h2>
+        <form action="/filesupload" method="post" enctype="multipart/form-data">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="customFile" name="file">
+                <label class="custom-file-label" for="customFile">Choose file</label>
+            </div>
+            <div class="pb-4"></div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+            {% if error %}
+                <div class="pb-4"></div>
+                <div class="alert alert-danger" role="alert">
+                    {{ error|safe }}
+                </div>
+            {% endif %}
+        </form>
+    </div>
+    <script>
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+
 {% endblock %}

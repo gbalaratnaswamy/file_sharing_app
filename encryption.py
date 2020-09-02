@@ -1,7 +1,7 @@
 import hashlib
 import random
 import string
-from cfg import AUTH_COOKIE_LENGTH
+from cfg import AUTH_COOKIE_LENGTH, FILE_HASH_LENGHT
 
 
 def encrypt_string(hash_string):
@@ -21,3 +21,7 @@ def create_cookie_auth(collection, length=AUTH_COOKIE_LENGTH):
         return random_string
     return create_cookie_auth(collection, length)
 
+
+def generate_file_hash(length=FILE_HASH_LENGHT):
+    random_string = generate_string(length)
+    return random_string

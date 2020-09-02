@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+
+{% block content %}
+   name is {{ file.file_name }}
+    <br>
+    size is {{ file.file_size }}
+    <br>
+    <a href="/files/{{ hash }}/download/{{ file.file_name }}.{{ file.file_type }}">download</a>
+
+
+{% endblock %}
