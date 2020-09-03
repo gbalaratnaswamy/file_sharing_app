@@ -19,10 +19,16 @@
                         </div>
                         <div class="col-sm-2">
                             <button
-                               class="btn btn-lite" onclick="show_modal('/files/{{ item.file_hash }}/{{ item.file_name }}-{{ item.file_type }}')" >share</button>
+                                    class="btn btn-lite"
+                                    onclick="show_modal('/files/{{ item["_id"] }}/{{ item.file_name }}-{{ item.file_type }}')">
+                                share
+                            </button>
                         </div>
                         <div class="col-sm-2">
-                            <button type="button" class="btn btn-light">delete</button>
+                            <button type="button" class="btn btn-light"
+                                    onclick="delete_alert('/files/{{ item["_id"] }}/delete/{{ item.file_name }}-{{ item.file_type }}')">
+                                delete
+                            </button>
                         </div>
                     </div>
                 {% endfor %}
@@ -45,33 +51,59 @@
                 </div>
                 <div class="modal-body">
                     <input type="text" class="form-control" id="modal_content" value="link here">
-{#                    <div class="pt-4" >#}
-{##}
-{#                    </div>#}
+                    {#                    <div class="pt-4" >#}
+                    {##}
+                    {#                    </div>#}
 
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="copy_content()">copy</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-{#                    <button type="button" class="btn btn-primary">Save changes</button>#}
+                    {#                    <button type="button" class="btn btn-primary">Save changes</button>#}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="delete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>are you sure do you want to delete</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="" role="button" class="btn btn-primary" id="deletelink">delete</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancle</button>
+
                 </div>
             </div>
         </div>
     </div>
     <script>
 
-    let modal_content=document.getElementById("modal_content")
-    let show_modal = function (link){
-        modal_content.setAttribute("value","localhost:5000"+link)
-        $("#modal").modal("show")
+        let modal_content = document.getElementById("modal_content")
+        let modal_delete = document.getElementById("delete")
+        let delete_link = document.getElementById("deletelink")
+        let delete_alert = function (link) {
+            delete_link.setAttribute("href", link)
+            $("#delete").modal("show")
+        }
+        let show_modal = function (link) {
+            modal_content.setAttribute("value", "localhost:5000" + link)
+            $("#modal").modal("show")
 
-    }
-    let copy_content=function (){
-        modal_content.select()
-        document.execCommand("copy");
-        alert("link copied");
-    }
+        }
+        let copy_content = function () {
+            modal_content.select()
+            document.execCommand("copy");
+            alert("link copied");
+        }
     </script>
 {% endblock %}

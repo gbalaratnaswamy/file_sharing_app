@@ -132,7 +132,8 @@ def upload_file():
         file_name = file_name.rsplit('.', 1)[0]
         if file_type not in ALLOWED_EXTENSIONS:
             return render_template("files_upload.html", error="files not supported")
-        file_path = os.path.join(f"files/{user['email']}/", file_name)
+        file_hash = encryption.generate_file_hash()
+        file_path = os.path.join(f"files/{user['email']}/", file_hash + file_name + "." + file_type)
         if not os.path.exists(f"files/{user['email']}"):
             os.mkdir(f"files/{user['email']}")
         f.save(file_path)
@@ -143,14 +144,15 @@ def upload_file():
             return render_template("files_upload.html",
                                    error=f"files size exceed you have already consumed {fm.modify_file_size(size_consumed)} new "
                                          f"file size is {fm.modify_file_size(file_size)}")
+
         mongo.db[FILES_COLLECTION].insert_one({"email": user["email"],
                                                "file_name": file_name,
                                                "file_type": file_type,
                                                "created_at": datetime.now(),
                                                "file_size": file_size,
-                                               "file_hash": encryption.generate_file_hash(),
+                                               "file_hash": file_hash,
                                                "is_active": True,
-                                               "file_path": "files/" + file_name})
+                                               "file_path": file_path})
         size_consumed += file_size
         mongo.db[USER_COLLECTION].update_one({"_id": user["_id"]},
                                              {"$set": {"size_consumed": size_consumed,
