@@ -1,7 +1,15 @@
 from flask import Flask, render_template, request, redirect, abort, url_for
-from werkzeug.utils import secure_filename
 from flask_pymongo import PyMongo
+from werkzeug.utils import secure_filename
+
 from cfg import *
+
+app = Flask(__name__)
+app.config["MONGO_URI"] = DATABASE_URL
+app.config["MAX_CONTENT_PATH"] = MAX_FILE_SIZE
+app.config['UPLOAD_FOLDER'] = "files"
+mongo = PyMongo(app)
+
 import user_management as usrm
 import cookies
 import errors_and_info
@@ -11,12 +19,7 @@ from datetime import datetime
 import files_manager as fm
 import encryption
 
-app = Flask(__name__)
-app.config["MONGO_URI"] = DATABASE_URL
-mongo = PyMongo(app)
 app.register_blueprint(files_blueprint)
-app.config["MAX_CONTENT_PATH"] = MAX_FILE_SIZE
-app.config['UPLOAD_FOLDER'] = "files"
 
 
 @app.route('/')
@@ -68,9 +71,7 @@ def signup(error=None):
 
 @app.route("/logout")
 def logout():
-    if usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
-        return cookies.clear_auth_cookies(mongo.db[AUTH_COLLECTION], request)
-    return redirect("/login")
+    return cookies.clear_auth_cookies(mongo.db[AUTH_COLLECTION], request)
 
 
 @app.route("/updatepass", methods=["POST", "GET"])
@@ -109,7 +110,7 @@ def testing_page():
 @app.route("/userinfo")
 def user_info():
     if not usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
-        return redirect("/loign")
+        return redirect("/login")
     user = mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
     return render_template("user_info.html", name=user["name"])
 
@@ -118,47 +119,6 @@ def user_info():
 def update_name():
     usrm.change_name(mongo.db[USER_COLLECTION], request.cookies.get("email"), request.form["newname"])
     return redirect("/userinfo")
-
-
-@app.route('/filesupload', methods=['GET', 'POST'])
-def upload_file():
-    if not usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
-        return redirect("/login")
-    if request.method == 'POST':
-        f = request.files['file']
-        user = mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
-        file_name = secure_filename(f.filename)
-        file_type = fm.get_file_type(file_name)
-        file_name = file_name.rsplit('.', 1)[0]
-        if file_type not in ALLOWED_EXTENSIONS:
-            return render_template("files_upload.html", error="files not supported")
-        file_hash = encryption.generate_file_hash()
-        file_path = os.path.join(f"files/{user['email']}/", file_hash + file_name + "." + file_type)
-        if not os.path.exists(f"files/{user['email']}"):
-            os.mkdir(f"files/{user['email']}")
-        f.save(file_path)
-        file_size = os.stat(file_path).st_size
-        size_consumed = user.get("size_consumed", 0)
-        if size_consumed + file_size > MAX_FILE_SIZE:
-            os.remove(file_path)
-            return render_template("files_upload.html",
-                                   error=f"files size exceed you have already consumed {fm.modify_file_size(size_consumed)} new "
-                                         f"file size is {fm.modify_file_size(file_size)}")
-
-        mongo.db[FILES_COLLECTION].insert_one({"email": user["email"],
-                                               "file_name": file_name,
-                                               "file_type": file_type,
-                                               "created_at": datetime.now(),
-                                               "file_size": file_size,
-                                               "file_hash": file_hash,
-                                               "is_active": True,
-                                               "file_path": file_path})
-        size_consumed += file_size
-        mongo.db[USER_COLLECTION].update_one({"_id": user["_id"]},
-                                             {"$set": {"size_consumed": size_consumed,
-                                                       "updated_at": datetime.now()}})
-        return redirect("/dashboard")
-    return render_template("files_upload.html")
 
 
 if __name__ == '__main__':
