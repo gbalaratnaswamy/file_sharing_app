@@ -98,8 +98,9 @@ def user_page():
     # if not login redirect to login
     if not result:
         return render_template("login.html", error=errors_and_info.NOT_LOGIN_ERROR)
-    data = mongo.db[FILES_COLLECTION].find({"email": request.cookies.get("email")})
-    return render_template("user_page.html", data=data)
+    data = mongo.db[FILES_COLLECTION].find({"email": request.cookies.get("email"), "is_active": True})
+    user = mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
+    return render_template("user_page.html", data=data, user=user)
 
 
 @app.route("/test")
@@ -112,6 +113,7 @@ def user_info():
     if not usrm.check_user(request, mongo.db[AUTH_COLLECTION]):
         return redirect("/login")
     user = mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
+
     return render_template("user_info.html", name=user["name"])
 
 
@@ -123,3 +125,7 @@ def update_name():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.template_filter("file_size_str")
+def file_size_str(s):
+    return str(fm.modify_file_size(int(s)))

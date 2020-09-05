@@ -10,33 +10,48 @@
             <div class="col-sm-6">
 
                 <div class="p-3">
-                    user name email storage
-                </div>
-                {% for item in data %}
-                    <div class="row" style="background-color: rgb(248, 248, 248);">
-                        <div class="col-sm-8">
-                            {{ item.file_name }}
+                    <div class="row">
+                        <div class="col-sm-3">
+                            {% if user["name"] is not none %}{{ user["name"] }}{% else %} "
+                                <a href="/userinfo">set name</a>{% endif %}
                         </div>
-                        <div class="col-sm-2">
-                            <button
-                                    class="btn btn-lite"
-                                    onclick="show_modal('/files/{{ item["_id"] }}/{{ item.file_name }}-{{ item.file_type }}')">
-                                share
-                            </button>
+                        <div class="col-sm-6">
+                            size used: {{ user["size_consumed"]|file_size_str }}
                         </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-light"
-                                    onclick="delete_alert('/files/{{ item["_id"] }}/delete/{{ item.file_name }}-{{ item.file_type }}')">
-                                delete
-                            </button>
+                        <div class="col-sm-3">
+                            <div style="float: right; display: inline"><a href="/filesupload" role="button"
+                                                                          class="btn btn-lite">upload</a></div>
                         </div>
+
+                        <div class="m-4"></div>
+
                     </div>
-                {% endfor %}
+                    {% for item in data %}
+                        <div class="row" style="background-color: rgb(248, 248, 248);">
+                            <div class="col-sm-8">
+                                {{ item.file_name }}
+                            </div>
+                            <div class="col-sm-2">
+                                <button
+                                        class="btn btn-lite"
+                                        onclick="show_modal('/files/{{ item["_id"] }}/{{ item.file_name }}-{{ item.file_type }}')">
+                                    share
+                                </button>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-light"
+                                        onclick="delete_alert('/files/{{ item["_id"] }}/delete/{{ item.file_name }}-{{ item.file_type }}')">
+                                    delete
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
 
-            </div>
+                </div>
 
-            <div class="col-sm-3">
+                <div class="col-sm-3">
 
+                </div>
             </div>
         </div>
     </div>
@@ -86,6 +101,7 @@
             </div>
         </div>
     </div>
+
     <script>
 
         let modal_content = document.getElementById("modal_content")
