@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, abort, url_for
 from flask_pymongo import PyMongo
-from werkzeug.utils import secure_filename
 
 from cfg import *
 
@@ -14,22 +13,23 @@ import user_management as usrm
 import cookies
 import errors_and_info
 from files_blueprint import files_blueprint
-import os
-from datetime import datetime
 import files_manager as fm
-import encryption
-
+from werkzeug.exceptions import BadRequestKeyError
 app.register_blueprint(files_blueprint)
 
 
 @app.route('/')
-def hello_world():
+def index():
     return render_template("index.html")
 
 
 @app.route("/login", methods=["POST", "GET"])
-def login(error=None):
+def login():
     # if user post data
+    try:
+        error = request.values["error"]
+    except BadRequestKeyError:
+        error = None
     if request.method == "POST":
         result = usrm.login_user(mongo.db[USER_COLLECTION], request.form["password"], request.form["email"])
         # if user login successfully
@@ -125,6 +125,7 @@ def update_name():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 @app.template_filter("file_size_str")
 def file_size_str(s):
