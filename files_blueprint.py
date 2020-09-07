@@ -41,6 +41,7 @@ def delete_file(file_index, file_name):
     if not usrm.check_user(request, app.mongo.db[AUTH_COLLECTION]):
         return redirect("/login")
     file_name = file_name.rsplit('-', 1)[0]
+    user = app.mongo.db[USER_COLLECTION].find_one({"email": request.cookies.get("email")})
     file = app.mongo.db[FILES_COLLECTION].find_one({"_id": ObjectId(file_index), "file_name": file_name})
     if file is None:
         return abort(404)
@@ -50,6 +51,9 @@ def delete_file(file_index, file_name):
         return abort(403)
     os.remove(file["file_path"])
     app.mongo.db[FILES_COLLECTION].update_one({"_id": file["_id"]}, {"$set": {"is_active": False}})
+    app.mongo.db[USER_COLLECTION].update_one({"_id": user["_id"]},
+                                             {"$set": {"size_consumed": user["size_consumed"]-file["file_size"],
+                                                       "updated_at": datetime.now()}})
     return "delete successful"
 
 
