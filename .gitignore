@@ -6,3 +6,4 @@ auth/__pycache__/
 encryption/__pycache__/
 db/__pycache__/
 files/__pycache__/
+test.py
