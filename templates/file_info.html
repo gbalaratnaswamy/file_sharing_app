@@ -1,0 +1,52 @@
+{% extends "template.html" %}
+{% block style %}
+    style="background-color: rgb(248, 248, 248);"
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8" style="background-color: rgb(248, 248, 248);">
+            <p>file name - {{ file.file_name }}</p>
+            <p>file type - {{ file.file_type }}</p>
+            <p>file size - {{ file.size|str_file_size }}</p>
+            {% if not file.get_is_active() %}
+                <p style="color: red">file is deleted</p>
+            {% endif %}
+            {% if file.downloads|length>0 %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">User name</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in file.downloads %}
+                        <tr>
+                            <td>{{ item["_id"] }}</td>
+                            <td>{{ item.time.strftime("%x") }}</td>
+                            <td>{{ item.time.strftime("%X") }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No downloads recorded</p>
+            {% endif %}
+            {#            {% for item in file.downloads %}#}
+            {#                <div class="row">#}
+            {#                    <div class="col-sm-8">#}
+            {#                        {{ item["_id"] }}#}
+            {#                    </div>#}
+            {#                    <div class="col-sm-4">#}
+            {#                        {{ item.time }}#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#            {% endfor %}#}
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+{% endblock %}

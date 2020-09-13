@@ -1,0 +1,175 @@
+{% extends "template.html" %}
+
+
+
+{% block content %}
+    <div class="form container-fluid">
+        <div class="row">
+            <div class="col-sm-3">
+            </div>
+            <div class="col-sm-6">
+
+                <div class="p-3">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            {% if user.name is not none %}{{ user.name }}{% else %}
+                                <a href="/update">set name</a>{% endif %}
+                        </div>
+                        <div class="col-sm-6">
+                            size used: {{ user.size|str_file_size }}
+                        </div>
+                        <div class="col-sm-3">
+                            <div style="float: right; display: inline"><a href="/files/upload" role="button"
+                                                                          class="btn btn-light">upload</a></div>
+                        </div>
+
+                        <div class="m-4"></div>
+
+                    </div>
+                    {% if user.size>0 %}
+
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">File Name</th>
+                                <th scope="col">Info</th>
+                                <th scope="col">Share</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in data %}
+                                {% if item.get_is_active() %}
+                                    <tr>
+                                        <td>{{ item.file_name }}</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-light"
+                                               href="/files/history/{{ item.id }}/{{ item.file_name }}">info</a>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-light btn-sm"
+                                                    onclick="show_modal('/files/view/{{ item.id }}/{{ item.file_name }}')">
+                                                share
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm"
+                                                    onclick="delete_alert('/files/delete/{{ item.id }}/{{ item.file_name }}')">
+                                                delete
+                                            </button>
+                                        </td>
+                                    </tr>
+
+
+                                    {#                            <div class="row" style="background-color: rgb(248, 248, 248);">#}
+                                    {#                                <div class="col-sm-7">#}
+                                    {#                                    {{ item.file_name }}#}
+                                    {#                                </div>#}
+                                    {#                                <div class="col-sm-1">#}
+                                    {#                                    {{ item.size|str_file_size }}#}
+                                    {#                                </div>#}
+                                    {#                                <div class="col-sm-1">#}
+                                    {#                                    <a type="button"#}
+                                    {#                                            class="btn btn-light"#}
+                                    {#                                            href="/files/history/{{ item.id }}/{{ item.file_name }}">#}
+                                    {#                                        info#}
+                                    {#                                    </a>#}
+                                    {#                                </div>#}
+                                    {#                                <div class="col-sm-1">#}
+                                    {#                                    <button#}
+                                    {#                                            class="btn btn-light"#}
+                                    {#                                            onclick="show_modal('/files/view/{{ item.id }}/{{ item.file_name }}')">#}
+                                    {#                                        share#}
+                                    {#                                    </button>#}
+                                    {#                                </div>#}
+                                    {#                                <div class="col-sm-1">#}
+                                    {#                                    <button type="button" class="btn btn-light"#}
+                                    {#                                            onclick="delete_alert('/files/delete/{{ item.id }}/{{ item.file_name }}')">#}
+                                    {#                                        delete#}
+                                    {#                                    </button>#}
+                                    {#                                </div>#}
+                                    {#                            </div>#}
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Uploaded files shown here</p>
+                    {% endif %}
+
+                </div>
+
+                <div class="col-sm-3">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">share link</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="modal_content" value="link here">
+                    {#                    <div class="pt-4" >#}
+                    {##}
+                    {#                    </div>#}
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="copy_content()">copy</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                    {#                    <button type="button" class="btn btn-primary">Save changes</button>#}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="delete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>are you sure do you want to delete</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="" role="button" class="btn btn-primary" id="deletelink">delete</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancle</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        let modal_content = document.getElementById("modal_content")
+        let modal_delete = document.getElementById("delete")
+        let delete_link = document.getElementById("deletelink")
+        let delete_alert = function (link) {
+            delete_link.setAttribute("href", link)
+            $("#delete").modal("show")
+        }
+        let show_modal = function (link) {
+            modal_content.setAttribute("value", "localhost:5000" + link)
+            $("#modal").modal("show")
+
+        }
+        let copy_content = function () {
+            modal_content.select()
+            document.execCommand("copy");
+            alert("link copied");
+        }
+    </script>
+{% endblock %}
