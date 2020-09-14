@@ -13,3 +13,4 @@ templates/info_page.html
 templates/sharepage.html
 templates/display_file.html
 templates/errors/
+templates/components/
