@@ -12,3 +12,4 @@ templates/update_pass.html
 templates/info_page.html
 templates/sharepage.html
 templates/display_file.html
+templates/errors/
