@@ -7,3 +7,8 @@ encryption/__pycache__/
 db/__pycache__/
 files/__pycache__/
 test.py
+templates/test.html
+templates/update_pass.html
+templates/info_page.html
+templates/sharepage.html
+templates/display_file.html

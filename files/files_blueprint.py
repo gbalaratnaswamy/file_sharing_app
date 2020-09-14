@@ -107,4 +107,4 @@ def file_history(file_index, file_name):
         file = db.File.find_file({"_id": ObjectId(file_index), "file_name": file_name})
     except db.errors.NoFileError:
         return abort(404)
-    return render_template("file_info.html", file=file,user=user)
+    return render_template("file_view.html", file=file, user=user)

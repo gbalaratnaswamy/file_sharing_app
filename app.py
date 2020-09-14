@@ -17,8 +17,8 @@ import files.files_manager as fm
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def index():
+    return render_template("index.html")
 
 
 class SingUP(MethodView):
@@ -97,7 +97,7 @@ def dashboard():
     user = auth.check_user()
     if user is None:
         return redirect("/login")
-    return render_template("user_page.html", user=user, data=db.File.get_all_file(user.id))
+    return render_template("dashboard.html", user=user, data=db.File.get_all_file(user.id))
 
 
 @app.route("/logout")
