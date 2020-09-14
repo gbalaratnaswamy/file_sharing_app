@@ -42,7 +42,7 @@ def download_file(file_index, file_name):
     except db.errors.NoFileError:
         return abort(404)
     file.downloads = user.email
-    try :
+    try:
         return send_file(file.path, attachment_filename=file_name)
     except FileNotFoundError:
         return abort(404)
