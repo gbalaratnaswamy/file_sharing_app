@@ -1,4 +1,4 @@
-from flask import request, redirect, render_template, Blueprint, url_for, abort, make_response, send_file
+from flask import request, redirect, render_template, Blueprint, url_for, abort, make_response, send_file, session
 import db.models as db
 import auth.api as auth
 from . import files_manager
@@ -52,7 +52,8 @@ def download_file(file_index, file_name):
 def delete_file(file_index, file_name):
     user = auth.check_user()
     if user is None:
-        return redirect(url_for("login", error="you must login to delete"))
+        session["error"] = "you must login to delete"
+        return redirect(url_for("login"))
     try:
         file = db.File.find_file({"_id": ObjectId(file_index), "file_name": file_name})
     except db.errors.NoFileError:
@@ -62,7 +63,8 @@ def delete_file(file_index, file_name):
     os.remove(file.path)
     file.set_is_active(False)
     user.size -= file.size
-    return redirect("/dashboard")
+    session["info"] = f"{file.file_name} deleted successfully"
+    return redirect(url_for("dashboard"))
 
 
 @files_blueprint.route('/files/upload', methods=['GET', 'POST'])
@@ -70,20 +72,22 @@ def upload_file():
     pass
     user = auth.check_user()
     if user is None:
-        return redirect(url_for("login", error="please login"))
+        session["error"] = "please login"
+        return redirect(url_for("login"))
     if request.method == "GET":
-        return render_template("files_upload.html", error=request.values.get("error"), user=user)
+        return render_template("files_upload.html", error=session.pop("error", None), user=user)
     f = request.files["file"]
     try:
         file_name, file_type = files_manager.get_file_info(f)
         file_size = int(request.form["size"])
     except files_manager.NotAllowedError:
-        return redirect(url_for("upload_file",
-                                error="file type not supported"))
+        session["error"] = "file type not supported"
+        return redirect(url_for("upload_file"))
     size_consumed = user.size + file_size
     if size_consumed > cfg.MAX_FILE_SIZE:
-        return redirect(url_for("upload_file",
-                                error=f"you don't have enough space your file has {files_manager.str_file_size(file_size)} but you only have {files_manager.str_flie_size(user.size)}"))
+        session["error"] = f"you don't have enough space your file has {files_manager.str_file_size(file_size)} " \
+                           f"but you only have {files_manager.str_file_size(user.size)}"
+        return redirect(url_for("upload_file"))
     file_hash = files_manager.generate_file_hash()
     file_path = os.path.join(f"{cfg.DEFAULT_UPLOAD_FOLDER}/{user.email}/", file_hash + file_name + "." + file_type)
     if not os.path.exists(f"{cfg.DEFAULT_UPLOAD_FOLDER}/{user.email}"):

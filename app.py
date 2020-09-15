@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, url_for, abort
+from flask import Flask, request, redirect, render_template, url_for, abort, session
 from flask_pymongo import PyMongo
 from flask.views import MethodView
 import cfg
@@ -10,7 +10,7 @@ app.config["MONGO_URI"] = cfg.DATABASE_URL
 app.config["MAX_CONTENT_PATH"] = cfg.MAX_FILE_SIZE
 app.config['UPLOAD_FOLDER'] = cfg.DEFAULT_UPLOAD_FOLDER
 mongo = PyMongo(app)
-
+app.secret_key = "idnegeos"
 import auth.api as auth
 import db.models as db
 from files.files_blueprint import files_blueprint
@@ -19,14 +19,15 @@ import files.files_manager as fm
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    user = auth.check_user()
+    return render_template("index.html", user=user)
 
 
 class SingUP(MethodView):
     def get(self):
         if auth.check_user() is not None:
             return redirect("/dashboard")
-        return render_template("signup.html", error=request.values.get("error"))
+        return render_template("signup.html", error=session.pop("error", None))
 
     def post(self):
         email = request.form["email"]
@@ -38,7 +39,8 @@ class SingUP(MethodView):
         try:
             user, response = auth.signup_user(email, password, target)
         except auth.errors.UserExistError:
-            return redirect(f"/signup?error=account with {email} already exist try <a href='/login'>login</a>")
+            session["error"] = f"account with {email} already exist try <a href='/login'>login</a>"
+            return redirect(f"/signup")
         return response
 
 
@@ -46,7 +48,7 @@ class Login(MethodView):
     def get(self):
         if auth.check_user() is not None:
             return redirect("/dashboard")
-        return render_template("login.html", error=request.values.get("error"))
+        return render_template("login.html", error=session.pop("error", None))
 
     def post(self):
         email = request.form["email"]
@@ -58,9 +60,11 @@ class Login(MethodView):
         try:
             user, val = auth.login_user(email, password, target)
         except db.errors.NoUserError:
-            return redirect(url_for("login", error=f"there is no email with {email} try <a href='/signup>signup</a>"))
+            session["error"] = f"there is no email with {email} try <a href='/signup>signup</a>"
+            return redirect(url_for("login"))
         except auth.errors.WrongPasswordError:
-            return redirect(url_for("login", error="you have entered wrong password"))
+            session["error"] = "you have entered wrong password"
+            return redirect(url_for("login"))
         return val
 
 
@@ -80,11 +84,13 @@ class UpdateUser(MethodView):
             return abort(404)
         if value == "name":
             user.name = request.form["name"]
-            return redirect(url_for("update", info=" your name updated successfully"))
+            session["info"] = "your name updated successfully"
+            return redirect(url_for("update"))
         if not encrypt.check_password(request.form["old_password"], user.password):
             return abort(404)
         user.password = encrypt.encrypt_password(request.form["password"])
-        return redirect(url_for("update", info=" your password updated successfully"))
+        session["info"] = "your password updated successfully"
+        return redirect(url_for("update"))
 
 
 @app.route("/test")
@@ -98,7 +104,8 @@ def dashboard():
     user = auth.check_user()
     if user is None:
         return redirect("/login")
-    return render_template("dashboard.html", user=user, data=db.File.get_all_file(user.id))
+    return render_template("dashboard.html", user=user, data=db.File.get_all_file(user.id),
+                           info=session.pop("info", None))
 
 
 @app.route("/logout")
@@ -120,6 +127,7 @@ def str_date(date):
 @app.template_filter()
 def str_to_mb(size):
     return fm.str_to_mb(size)
+
 
 # @app.template_filter()
 # def size_to_progress(size)
