@@ -28,3 +28,8 @@ def str_file_size(size: int) -> str:
         return f"{size:.2f} MB"
     size /= 1024
     return f"{size:.2f} GB"
+
+
+def str_to_mb(size: int) -> str:
+    size /= 1024 * 1024
+    return f"{size:.2f}"

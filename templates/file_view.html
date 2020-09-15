@@ -10,6 +10,7 @@
             <p>file name - {{ file.file_name }}</p>
             <p>file type - {{ file.file_type }}</p>
             <p>file size - {{ file.size|str_file_size }}</p>
+            <p>created on - {{ file.created_at.strftime('%x') }} at {{ file.created_at.strftime('%X') }}</p>
             {% if not file.get_is_active() %}
                 <p style="color: red">file is deleted</p>
             {% endif %}

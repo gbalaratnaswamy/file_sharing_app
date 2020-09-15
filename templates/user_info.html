@@ -4,10 +4,11 @@
         <div class="row">
             <div class="col-sm-3">
             </div>
-            <div class="col-sm-6" style="background-color: rgb(248, 248, 248);">
+            <div class="col-sm-6 mb-4 pb-4" style="background-color: rgb(248, 248, 248);">
+                <h2 class="text-center">Basic info</h2>
                 <form action="/update/name" method="post">
                     <div class="form-group row">
-                        <label for="name" class="col-sm-2 col-form-label">name</label>
+                        <label for="name" class="col-sm-2 col-form-label">First name</label>
                         <div class="col-sm-10">
                             <input type="text" readonly class="form-control-plaintext" id="name"
                                    {% if user.name is not none %}value=
@@ -26,7 +27,7 @@
                 {#                <div class="text-center mb-3">#}
                 {#                    <a href="/update/password" class="btn btn-primary" role="button" aria-pressed="true">change password</a>#}
                 {#                </div>#}
-                <h2 class="text-center">update password</h2>
+                <h2 class="text-center">Update password</h2>
                 <form action="/update/password" method="post"
                       oninput='conf_password.setCustomValidity(conf_password.value !== password.value ? "Passwords do not match." : "")'>
                     <div class="form-group">
@@ -51,6 +52,14 @@
                     <button type="submit" class="btn btn-primary" id="submit" disabled>Change Password</button>
 
                 </form>
+                <h2 class="text-center">Usage</h2>
+                <p>size consumed - {{ user.size|str_to_mb }}/300mb</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="70"
+                         aria-valuemin="0" aria-valuemax="100" style="width :{{ user.size/(300*1024*1024) }}%">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
             </div>
             <div class="col-sm-3">
             </div>

@@ -92,7 +92,7 @@ def upload_file():
     if file_size != os.stat(file_path).st_size:
         os.remove(file_path)
         return abort(400)
-    db.File.create_file(file_name, file_size, file_path, file_hash, file_type, user.id)
+    db.File.create_file(f.filename, file_size, file_path, file_hash, file_type, user.id)
     user.size += file_size
     return redirect("/dashboard")
 

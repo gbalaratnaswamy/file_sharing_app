@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, render_template, url_for, abort
 from flask_pymongo import PyMongo
 from flask.views import MethodView
 import cfg
+from datetime import datetime
 import encryption.encryption as encrypt
 
 app = Flask(__name__)
@@ -110,6 +111,20 @@ def str_file_size(size):
     return fm.str_file_size(size)
 
 
+@app.template_filter()
+def str_date(date):
+    difference = datetime.now() - date
+    return f"{difference.days} days"
+
+
+@app.template_filter()
+def str_to_mb(size):
+    return fm.str_to_mb(size)
+
+# @app.template_filter()
+# def size_to_progress(size)
+#     progress=size/1024
+#     progress
 app.add_url_rule('/signup', view_func=SingUP.as_view('signup'))
 app.add_url_rule('/login', view_func=Login.as_view('login'))
 app.add_url_rule('/update', view_func=UpdateUser.as_view('update'))
