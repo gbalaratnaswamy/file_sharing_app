@@ -7,7 +7,7 @@ import cfg
 from datetime import datetime
 from bson import ObjectId
 
-files_blueprint = Blueprint('example_blueprint', __name__)
+files_blueprint = Blueprint('file_blueprint', __name__)
 
 
 @files_blueprint.route('/files/view/<file_index>/<file_name>')
@@ -82,12 +82,12 @@ def upload_file():
         file_size = int(request.form["size"])
     except files_manager.NotAllowedError:
         session["error"] = "file type not supported"
-        return redirect(url_for("upload_file"))
+        return redirect(url_for("file_blueprint.upload_file"))
     size_consumed = user.size + file_size
     if size_consumed > cfg.MAX_FILE_SIZE:
         session["error"] = f"you don't have enough space your file has {files_manager.str_file_size(file_size)} " \
                            f"but you only have {files_manager.str_file_size(user.size)}"
-        return redirect(url_for("upload_file"))
+        return redirect(url_for("file_blueprint.upload_file"))
     file_hash = files_manager.generate_file_hash()
     file_path = os.path.join(f"{cfg.DEFAULT_UPLOAD_FOLDER}/{user.email}/", file_hash + file_name + "." + file_type)
     if not os.path.exists(f"{cfg.DEFAULT_UPLOAD_FOLDER}/{user.email}"):

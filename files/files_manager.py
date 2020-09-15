@@ -1,6 +1,6 @@
 import encryption.encryption as encrypt
 from werkzeug.utils import secure_filename
-from cfg import FILE_HASH_LENGTH
+from cfg import FILE_HASH_LENGTH, ALLOWED_FILE_EXTENSIONS
 
 
 class NotAllowedError(Exception):
@@ -10,6 +10,10 @@ class NotAllowedError(Exception):
 def get_file_info(f):
     file_name = secure_filename(f.filename)
     file_name, file_type = file_name.rsplit('.', 1)
+    file_type = file_type.lower()
+    print(file_type)
+    if file_type not in ALLOWED_FILE_EXTENSIONS:
+        raise NotAllowedError
     return file_name, file_type
 
 
