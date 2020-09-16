@@ -4,7 +4,6 @@ import auth.api as auth
 from . import files_manager
 import os
 import cfg
-from datetime import datetime
 from bson import ObjectId
 
 files_blueprint = Blueprint('file_blueprint', __name__)

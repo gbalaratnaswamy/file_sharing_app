@@ -1,7 +1,6 @@
-import random
-import string
 import cfg
 from db.models import AuthTokens
+from .encryption import generate_random_string
 
 
 def generate_auth_token():

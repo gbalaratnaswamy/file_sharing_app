@@ -28,7 +28,8 @@ class User:
                 "size_consumed": 0,
                 "name": None,
                 # "session_id": [0] * cfg.MAX_SESSIONS,
-                "pos": 0}
+                "pos": 0,
+                "max_size": 300 * 1024 * 1024}
         inserted_id = mongo.db[cfg.USER_COLLECTION].insert_one(data)
         data.update({"_id": inserted_id.inserted_id})
         return cls(data)
@@ -86,6 +87,15 @@ class User:
 
     def get_id(self):
         return self.__data["_id"]
+
+    @property
+    def max_size(self):
+        return self.__data["max_size"]
+
+    @max_size.setter
+    def max_size(self, value):
+        self.__data["max_size"] = value
+        self.__update_user({"_id": self.id}, {"$set": {"max_size": value}})
 
     # def get_session_id(self) -> list:
     #     return self.__data["session_id"]

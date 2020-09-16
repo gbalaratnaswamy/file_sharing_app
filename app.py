@@ -76,16 +76,25 @@ class UpdateUser(MethodView):
         return render_template("user_info.html", user=user)
 
     def post(self, value):
-        print("yes")
         user = auth.check_user()
         if user is None:
             return redirect("/login")
-        if value not in ["name", "password"]:
+        if value not in ["name", "password", "plans"]:
             return abort(404)
         if value == "name":
             user.name = request.form["name"]
             session["info"] = "your name updated successfully"
             return redirect(url_for("update"))
+        if value == "plans":
+            try:
+                plan = int(request.form["plan"])
+            except ValueError:
+                return abort(500)
+            if plan not in [1, 2, 3]:
+                return abort(500)
+            plans_data = [350, 400, 450]
+            user.max_size = plans_data[plan-1]*1024*1024
+            return redirect("/update")
         if not encrypt.check_password(request.form["old_password"], user.password):
             return abort(404)
         user.password = encrypt.encrypt_password(request.form["password"])
