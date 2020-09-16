@@ -37,3 +37,23 @@ def str_file_size(size: int) -> str:
 def str_to_mb(size: int) -> str:
     size /= 1024 * 1024
     return f"{size:.2f}"
+
+
+def icon_file_type(file_type: str):
+    # icons={"image":"fa fa-file-picture-o",
+    #        "pdf":}
+    file_type = file_type.lower()
+    if file_type == "pdf":
+        return ''' <i class ="fa fa-file-pdf-o" style="font-size:24px" > </i> '''
+    if file_type in ["png", "jpg", "jpeg"]:
+        return ''' <i class ="fa fa-file-picture-o" style="font-size:24px" > </i>'''
+    if file_type == "txt":
+        return '''<i class ="fa fa-file-text-o" style="font-size:24px" > </i>'''
+    if file_type in ["doc", "docx"]:
+        return '''<i class ="fa fa-file-word-o" style="font-size:24px" > </i>'''
+    if file_type in ["ppt", "pptx"]:
+        return '''<i class ="fa fa-file-powerpoint-o" style="font-size:24px" > </i>'''
+    if file_type in ["xls", "csv"]:
+        return '''<i class ="fa fa-file-excel-o" style="font-size:24px" > </i>'''
+    else:
+        return '''<i class ="fa fa-file-o" style="font-size:24px" > </i>'''

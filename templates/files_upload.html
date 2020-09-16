@@ -10,7 +10,9 @@
             </div>
             <input type="number" id="size" style="display: none" name="size">
             <div class="pb-4"></div>
-            <button type="button" onclick="form_submit()" class="btn btn-primary btn-block">Submit</button>
+            <button type="button" onclick="form_submit({{ user.size }},{{ user.max_size }})"
+                    class="btn btn-primary btn-block">Submit
+            </button>
 
             {% if error %}
                 <div class="pb-4"></div>
@@ -18,24 +20,15 @@
                     {{ error|safe }}
                 </div>
             {% endif %}
+            <div style="display: none" id="jserror">
+                <div class="pb-4"></div>
+                <div class="alert alert-danger" role="alert" id="jserrormessage">
+
+                </div>
+            </div>
         </form>
     </div>
-    <script>
-        // Add the following code if you want the name of the file appear on select
-        $(".custom-file-input").on("change", function () {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        });
-        var file = document.getElementById("customFile")
-
-        var size_field = document.getElementById("size")
-
-        function form_submit() {
-            var size = file.files[0].size
-            console.log(size)
-            size_field.setAttribute("value", size)
-            $("#form").submit()
-        }
+    <script src="{{ url_for('static',filename='file_validation.js') }}">
     </script>
 
 {% endblock %}

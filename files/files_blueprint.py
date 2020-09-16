@@ -83,7 +83,7 @@ def upload_file():
         session["error"] = "file type not supported"
         return redirect(url_for("file_blueprint.upload_file"))
     size_consumed = user.size + file_size
-    if size_consumed > cfg.MAX_FILE_SIZE:
+    if size_consumed > user.max_size:
         session["error"] = f"you don't have enough space your file has {files_manager.str_file_size(file_size)} " \
                            f"but you only have {files_manager.str_file_size(user.size)}"
         return redirect(url_for("file_blueprint.upload_file"))

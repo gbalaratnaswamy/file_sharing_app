@@ -1,5 +1,4 @@
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -15,10 +14,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
             crossorigin="anonymous"></script>
-
     <title>MYBOX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-
 <body>
 <header>
     <h1 class="text-center m-0" style="line-height: 30px;">MYBOX</h1>
@@ -54,30 +52,16 @@
                         <a class="nav-link" href="/dashboard">dashboard <span class="sr-only">(current)</span></a>
                     </li>
                 {% endif %}
-
             </ul>
         </div>
-
-
     </nav>
 </header>
 <div class="m-5"></div>
 <main>
-    {#    <div class="form container-fluid">#}
-    {#        <div class="row">#}
-    {#            <div class="col-sm-3">#}
-    {#            </div>#}
-    {#            <div class="col-sm-6" {% block style %}{% endblock %}>#}
     <div class="p-1">
         {% block content %}
         {% endblock %}
     </div>
-    {#            </div>#}
-    {#            <div class="col-sm-3">#}
-    {##}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </div>#}
 </main>
 </body>
 </html>

@@ -11,6 +11,7 @@ app.config["MAX_CONTENT_PATH"] = cfg.MAX_FILE_SIZE
 app.config['UPLOAD_FOLDER'] = cfg.DEFAULT_UPLOAD_FOLDER
 mongo = PyMongo(app)
 app.secret_key = "idnegeos"
+
 import auth.api as auth
 import db.models as db
 from files.files_blueprint import files_blueprint
@@ -86,15 +87,16 @@ class UpdateUser(MethodView):
             session["info"] = "your name updated successfully"
             return redirect(url_for("update"))
         if value == "plans":
-            try:
-                plan = int(request.form["plan"])
-            except ValueError:
-                return abort(500)
-            if plan not in [1, 2, 3]:
-                return abort(500)
-            plans_data = [350, 400, 450]
-            user.max_size = plans_data[plan-1]*1024*1024
-            return redirect("/update")
+            return "Comming soon"
+            # try:
+            #     plan = int(request.form["plan"])
+            # except ValueError:
+            #     return abort(500)
+            # if plan not in [1, 2, 3]:
+            #     return abort(500)
+            # plans_data = [350, 400, 450]
+            # user.max_size = plans_data[plan - 1] * 1024 * 1024
+            # return redirect("/update")
         if not encrypt.check_password(request.form["old_password"], user.password):
             return abort(404)
         user.password = encrypt.encrypt_password(request.form["password"])
@@ -102,11 +104,14 @@ class UpdateUser(MethodView):
         return redirect(url_for("update"))
 
 
-@app.route("/test")
-def test():
-    print(auth.check_user())
-    return "hi"
+# @app.route("/test")
+# def test():
+    # print(request.cookies)
+    # print(auth.check_user())
 
+# @app.route("/test2")
+# def test2():
+#     return render_template("test.html")
 
 @app.route("/dashboard")
 def dashboard():
@@ -138,10 +143,11 @@ def str_to_mb(size):
     return fm.str_to_mb(size)
 
 
-# @app.template_filter()
-# def size_to_progress(size)
-#     progress=size/1024
-#     progress
+@app.template_filter()
+def icon_file_type(file_type):
+    return fm.icon_file_type(file_type)
+
+
 app.add_url_rule('/signup', view_func=SingUP.as_view('signup'))
 app.add_url_rule('/login', view_func=Login.as_view('login'))
 app.add_url_rule('/update', view_func=UpdateUser.as_view('update'))
