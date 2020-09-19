@@ -57,3 +57,10 @@ def icon_file_type(file_type: str):
         return '''<i class ="fa fa-file-excel-o" style="font-size:24px" > </i>'''
     else:
         return '''<i class ="fa fa-file-o" style="font-size:24px" > </i>'''
+
+
+def cut_file_name(file_name: str, val=15):
+    # file_name, file_type = file_name.rsplit('.', 1)
+    if len(file_name) > val:
+        return file_name[:val] + '...'
+    return file_name

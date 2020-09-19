@@ -106,8 +106,8 @@ class UpdateUser(MethodView):
 
 # @app.route("/test")
 # def test():
-    # print(request.cookies)
-    # print(auth.check_user())
+# print(request.cookies)
+# print(auth.check_user())
 
 # @app.route("/test2")
 # def test2():
@@ -118,7 +118,7 @@ def dashboard():
     user = auth.check_user()
     if user is None:
         return redirect("/login")
-    return render_template("dashboard.html", user=user, data=db.File.get_all_file(user.id),
+    return render_template("dashboard_card.html", user=user, data=db.File.get_all_file(user.id),
                            info=session.pop("info", None))
 
 
@@ -146,6 +146,11 @@ def str_to_mb(size):
 @app.template_filter()
 def icon_file_type(file_type):
     return fm.icon_file_type(file_type)
+
+
+@app.template_filter()
+def cut_file_name(file_name):
+    return fm.cut_file_name(file_name)
 
 
 app.add_url_rule('/signup', view_func=SingUP.as_view('signup'))
