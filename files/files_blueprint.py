@@ -102,7 +102,6 @@ def upload_file():
 
 @files_blueprint.route("/files/history/<file_index>/<file_name>")
 def file_history(file_index, file_name):
-    print("h0")
     user = auth.check_user()
     if user is None:
         return redirect(url_for("login"))
