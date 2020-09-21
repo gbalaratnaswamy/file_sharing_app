@@ -113,12 +113,14 @@ def file_history(file_index, file_name):
     return render_template("file_view.html", file=file, user=user)
 
 
-@files_blueprint.route("/js/files/delete/<file_index>/<file_name>")
-def js_file_delete(file_index, file_name):
-    try:
-        file = db.File.find_file({"_id": ObjectId(file_index), "file_name": file_name})
-    except db.errors.NoFileError:
-        return abort(404)
-    os.remove(file.path)
-    file.set_is_active(False)
-    return "success"
+# @files_blueprint.route("/js/files/delete/<file_index>/<file_name>")
+# def js_file_delete(file_index, file_name):
+#     # try:
+#     #     file = db.File.find_file({"_id": ObjectId(file_index), "file_name": file_name})
+#     # except db.errors.NoFileError:
+#     #     return abort(404)
+#     # os.remove(file.path)
+#     # file.set_is_active(False)
+#     # return "success"
+#     print(file_name)
+#     print(request.cookies)
