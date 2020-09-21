@@ -74,7 +74,7 @@ class UpdateUser(MethodView):
         user = auth.check_user()
         if user is None:
             return redirect("/login")
-        return render_template("user_info.html", user=user)
+        return render_template("user_info.html", user=user, error=session.pop("error", None))
 
     def post(self, value):
         user = auth.check_user()
@@ -98,7 +98,8 @@ class UpdateUser(MethodView):
             # user.max_size = plans_data[plan - 1] * 1024 * 1024
             # return redirect("/update")
         if not encrypt.check_password(request.form["old_password"], user.password):
-            return abort(404)
+            session["error"] = "wrong password"
+            return redirect(url_for("update"))
         user.password = encrypt.encrypt_password(request.form["password"])
         session["info"] = "your password updated successfully"
         return redirect(url_for("update"))

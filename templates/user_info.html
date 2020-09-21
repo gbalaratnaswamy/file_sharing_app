@@ -84,9 +84,14 @@
 {#                        </div>#}
 {#                    </div>#}
 {#                </div>#}
-                <form method="post" id="planForm" action="/update/plans" style="display: none">
-                    <input id="planHolder" name="plan">
-                </form>
+{#                <form method="post" id="planForm" action="/update/plans" style="display: none">#}
+{#                    <input id="planHolder" name="plan">#}
+{#                </form>#}
+            {% if error is not none %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error|safe }}
+                </div>
+            {% endif %}
             </div>
             <div class="col-sm-3">
             </div>
