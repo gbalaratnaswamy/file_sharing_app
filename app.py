@@ -38,11 +38,11 @@ class SingUP(MethodView):
         else:
             target = "/dashboard"
         try:
-            user, response = auth.signup_user(email, password, target)
+            user = auth.signup_user(email, password)
         except auth.errors.UserExistError:
             session["error"] = f"account with {email} already exist try <a href='/login'>login</a>"
             return redirect(f"/signup")
-        return response
+        return redirect(target)
 
 
 class Login(MethodView):
@@ -59,14 +59,14 @@ class Login(MethodView):
         else:
             target = "/dashboard"
         try:
-            user, val = auth.login_user(email, password, target)
+            user = auth.login_user(email, password)
         except db.errors.NoUserError:
             session["error"] = f"there is no email with {email} try <a href='/signup>signup</a>"
             return redirect(url_for("login"))
         except auth.errors.WrongPasswordError:
             session["error"] = "you have entered wrong password"
             return redirect(url_for("login"))
-        return val
+        return redirect(target)
 
 
 class UpdateUser(MethodView):
@@ -124,7 +124,8 @@ def dashboard():
 
 @app.route("/logout")
 def logout():
-    return auth.logout_user("/login")
+    auth.logout_user()
+    return redirect("/login")
 
 
 @app.template_filter()

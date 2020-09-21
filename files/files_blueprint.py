@@ -36,7 +36,7 @@ def download_file(file_index, file_name):
         response.set_cookie("target", f"/files/view/{file_index}/{file_name}")
     try:
         file = db.File.find_file({"_id": ObjectId(file_index)})
-        if file.file_name + "." + file.file_type != file_name:
+        if file.file_name != file_name:
             return abort(404)
     except db.errors.NoFileError:
         return abort(404)

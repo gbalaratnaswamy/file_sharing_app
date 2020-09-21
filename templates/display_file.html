@@ -1,0 +1,14 @@
+{% extends "template.html" %}
+
+{% block content %}
+   name is {{ file.file_name }}
+    <br>
+    file type {{ file.file_type }}
+    <br>
+    size is {{ file.size|str_file_size }}
+    <br>
+    <p>created on - {{ file.created_at.strftime('%x') }} at {{ file.created_at.strftime('%X') }}</p>
+    <a href="/files/download/{{ file.id }}/{{ file.file_name }}">download</a>
+
+
+{% endblock %}

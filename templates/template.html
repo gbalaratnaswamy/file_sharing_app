@@ -30,7 +30,7 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
-                {% if "_token" not in request.cookies %}
+                {% if "_token" not in session %}
                     <a class="nav-link active" href="/login">login <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item active">
